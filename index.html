@@ -26,6 +26,10 @@
     </style>
 </head>
 <body>
+    <img id="loading" src="loading.gif" style=" position: relative;
+                top: 50%;
+                transform: translateY(-50%);" />
+
     <script type="text/javascript">
         ; (function () {
 
@@ -155,11 +159,15 @@
             left: 37
         };
 
+        document.getElementById("loading").style.display = "inline";
+
         var radius = 1;
         
         var c10 = d3.scale.category10(); // Load Color Scale 
         
         d3.json("graph.json", function (data) {
+
+            document.getElementById("loading").style.display = "none";
 
             plot();
 
