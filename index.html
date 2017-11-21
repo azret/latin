@@ -19,6 +19,10 @@
             pointer-events: none;
             font: sans-serif;
         }
+        svg {
+            width: 100%;
+            height: 100%;
+        }
     </style>
 </head>
 <body>
@@ -112,11 +116,12 @@
                                             target: dict[n.i].id,
                                             weight: 13
                                         });
+                                        /*
                                         links.push({
                                             source: dict[n.i].id,
                                             target: dict[k.i].id,
                                             weight: 13
-                                        });
+                                        });*/
                                     }
                                 }
                             }
@@ -143,8 +148,6 @@
     </script>
 
     <script type="text/javascript">
-
-        //Set margins and sizes
         var margin = {
             top: 37,
             bottom: 37,
@@ -152,103 +155,125 @@
             left: 37
         };
 
-        var width = document.body.clientWidth - margin.left - margin.right;
-        var height = document.body.clientHeight - margin.top - margin.bottom;
-
         var radius = 1;
-
-        //Load Color Scale
-        var c10 = d3.scale.category10();
-        //Create an SVG element and append it to the DOM
-        var svgElement = d3.select("body")
-            .append("svg")
-            .append("g")
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-        // Load External Data
-
+        
+        var c10 = d3.scale.category10(); // Load Color Scale 
+        
         d3.json("graph.json", function (data) {
 
-            var g = d3.graph.build(data.graph, "schola");
+            plot();
 
-           //Extract data from dataset
-            var nodes = g.nodes,
-                links = g.links;
+            function plot() {
 
-            var force = d3.layout.force()
-                .size([width, height])
-                .nodes(nodes)
-                .links(links)
-                .gravity(0.1)
-                .charge(-277)
-                .linkDistance(311);
+                var width = document.body.clientWidth - margin.left - margin.right;
+                var height = document.body.clientHeight - margin.top - margin.bottom;
 
-            resize();
+                var s = document.location.hash;
 
-            d3.select(window).on("resize", resize);
+                if (!s.length) s = "forum";
 
-            function resize() {
+                s = s.replace("#", "");
 
-                width = document.body.clientWidth - margin.left - margin.right;
-                height = document.body.clientHeight - margin.top - margin.bottom;
+                d3.select("svg").remove();
 
-                svgElement.attr({ "width": document.body.clientWidth, "height": document.body.clientHeight });
+                var g = d3.select("body").append("svg").append("g");
 
-                force.size([width, height]).resume();
-            }
+                var graph = d3.graph.build(data.graph, s);
 
-            //Add links to SVG
-            var link = svgElement.selectAll(".link")
-                .data(links)
-                .enter()
-                .append("line")
-                .attr("stroke-width", function (d) { return d.weight / 10; })
-                .attr("class", "link");
-            //Add nodes to SVG
-            var node = svgElement.selectAll(".node")
-                .data(nodes)
-                .enter()
-                .append("g")
-                .attr("class", "node")
-                .call(force.drag);
-            //Add labels to each node
-            var label = node.append("text")
-                .attr("dx", 12)
-                .attr("dy", "0.35em")
-                .attr("font-size", function (d) { return d.influence * 1.5 > 21 ? d.influence * 1.5 : 21; })
-                .text(function (d) { return d.character; });
-            //Add circles to each node
-            var circle = node.append("circle")
-                .attr("r", function (d) { return d.influence / 2 > 5 ? d.influence / 2 : 5; })
-                .attr("fill", function (d) { return c10(d.zone * 10); });
-            //This function will be executed for every tick of force layout
-            force.on("tick", function () {
-                
-                //Set X and Y of node
-                node.attr("r", function (d) { return d.influence; })
-                    .attr("cx", function (d) { return d.x; })
-                    .attr("cy", function (d) { return d.y; });
-                //Set X, Y of link
-                link.attr("x1", function (d) { return d.source.x; })
-                link.attr("y1", function (d) { return d.source.y; })
-                link.attr("x2", function (d) { return d.target.x; })
-                link.attr("y2", function (d) { return d.target.y; });
-                 
-                /*
-                node.attr("cx", function (d) { return d.x = Math.max(radius, Math.min(width - radius, d.x)); })
-                    .attr("cy", function (d) { return d.y = Math.max(radius, Math.min(height - radius, d.y)); });
+                var nodes = graph.nodes, links = graph.links;
 
-                link.attr("x1", function (d) { return d.source.x; })
-                    .attr("y1", function (d) { return d.source.y; })
-                    .attr("x2", function (d) { return d.target.x; })
-                    .attr("y2", function (d) { return d.target.y; });
-                */
+                var force = d3.layout.force()
+                    .size([width, height])
+                    .nodes(nodes)
+                    .links(links)
+                    .gravity(0.07)
+                    .charge(-277)
+                    .linkDistance(311);
 
-                //Shift node a little
-                node.attr("transform", function (d) { return "translate(" + d.x + "," + d.y + ")"; });
-            });
-            //Start the force layout calculation
-            force.start();
+                resize();
+
+                d3.select(window).on("resize", resize);
+
+                d3.select(window).on("hashchange", function () {
+                    setTimeout(function () {
+                        plot();
+                    }, 100);
+                });
+
+                function resize() {
+
+                    width = document.body.clientWidth - margin.left - margin.right;
+                    height = document.body.clientHeight - margin.top - margin.bottom;
+
+                    force.size([width, height]).resume();
+                }
+
+                function dblclick(d) {
+                    setTimeout(function () {
+                        document.location.hash = d["character"]; 
+                    }, 100);
+                }
+
+                //Add links to SVG
+                var link = g.selectAll(".link")
+                    .data(links)
+                    .enter()
+                    .append("line")
+                    .attr("stroke-width", function (d) { return d.weight / 10; })
+                    .attr("class", "link");
+
+                //Add nodes to SVG
+                var node = g.selectAll(".node")
+                    .data(nodes)
+                    .enter()
+                    .append("g")
+                    .attr("class", "node")
+                    .on("dblclick", dblclick)
+                    .call(force.drag);
+
+                //Add labels to each node
+                var label = node.append("text")
+                    .attr("dx", 12)
+                    .attr("dy", "0.35em")
+                    .attr("font-size", function (d) { return d.influence * 1.5 > 21 ? d.influence * 1.5 : 21; })
+                    .text(function (d) { return d.character; });
+
+                //Add circles to each node
+                var circle = node.append("circle")
+                    .attr("r", function (d) { return d.influence / 2 > 5 ? d.influence / 2 : 5; })
+                    .attr("fill", function (d) { return c10(d.zone * 10); });
+
+                //This function will be executed for every tick of force layout
+                force.on("tick", function () {
+
+                    //Set X and Y of node
+                    node.attr("r", function (d) { return d.influence; })
+                        .attr("cx", function (d) { return d.x; })
+                        .attr("cy", function (d) { return d.y; });
+                    //Set X, Y of link
+                    link.attr("x1", function (d) { return d.source.x; })
+                    link.attr("y1", function (d) { return d.source.y; })
+                    link.attr("x2", function (d) { return d.target.x; })
+                    link.attr("y2", function (d) { return d.target.y; });
+
+                    /*
+                    node.attr("cx", function (d) { return d.x = Math.max(radius, Math.min(width - radius, d.x)); })
+                        .attr("cy", function (d) { return d.y = Math.max(radius, Math.min(height - radius, d.y)); });
+    
+                    link.attr("x1", function (d) { return d.source.x; })
+                        .attr("y1", function (d) { return d.source.y; })
+                        .attr("x2", function (d) { return d.target.x; })
+                        .attr("y2", function (d) { return d.target.y; });
+                    */
+
+                    //Shift node a little
+                    node.attr("transform", function (d) { return "translate(" + d.x + "," + d.y + ")"; });
+                });
+
+                //Start the force layout calculation
+                force.start();
+            }            
+
         });
     </script>
 </body>
