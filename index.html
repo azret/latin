@@ -106,7 +106,13 @@
                                 for (var j = 0; j < len && j < n.n.length && j < 11; j++) {
                                     var k = g[n.n[j]];
 
-                                    add(k, len * 0.33 , w * 0.67);
+                                    var dec = len * 0.33;
+                                    if (nodes.length < 37)
+                                    {
+                                        dec = len * 0.37;
+                                    }
+
+                                    add(k, dec, w * 0.67);
 
                                     if (dict[k.i]) {
                                         links.push({
