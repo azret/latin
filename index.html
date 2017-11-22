@@ -102,20 +102,20 @@
                                     "id": nodes.length,
                                     "influence": w,
                                     "ref": n.i,
-                                    "zone": level
+                                    "zone": w
                                 };
                                 nodes.push(e);
                             }
                             
                             if (n.n && n.n.length > 0) {
-                                for (var j = 0; j < len && j < n.n.length; j++) {
+                                for (var j = 0; j < len && j < n.n.length && j < 11; j++) {
                                     var k = g[n.n[j]];
-                                    add(k, len * 0.253, w * 0.647, level + 1);
+                                    add(k, len * 0.253, w * 0.747, level + 1);
                                     if (dict[k.i]) {
                                         links.push({
                                             source: dict[n.i].id,
                                             target: dict[k.i].id,
-                                            weight: w * 1.1
+                                            weight: w * 0.6
                                         });
                                     }
                                 }
@@ -232,8 +232,8 @@
                     .nodes(nodes)
                     .links(links)
                     .gravity(0.05)
-                    .charge(-300)
-                    .linkDistance(200);
+                    .charge(-200)
+                    .linkDistance(270);
 
                 resize();
 
