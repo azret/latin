@@ -78,8 +78,7 @@
                 build: function (g, s) {
                     var nodes = []; var links = []; var dict = {};
 
-                    function add(n, len, w) {
-                                   
+                    function add(n, len, w) {                                   
                         if (n) {
 
                             if (typeof len === 'number') {
@@ -96,45 +95,59 @@
                                     "character": n.l,
                                     "id": nodes.length,
                                     "influence": w,
-                                    "zone": n.i
+                                    "ref": n.i,
+                                    "zone": n.w
                                 };
                                 nodes.push(e);
                             }
                             
                             if (n.n && n.n.length > 0) {
-
-                                for (var j = 0; j < len && j < n.n.length && j < 11; j++) {
+                                for (var j = 0; j < len && j < n.n.length; j++) {
                                     var k = g[n.n[j]];
-
-                                    var dec = len * 0.33;
-                                    if (nodes.length < 37)
-                                    {
-                                        dec = len * 0.37;
-                                    }
-
-                                    add(k, dec, w * 0.67);
-
+                                    add(k, len * 0.253, w * 0.747);
                                     if (dict[k.i]) {
                                         links.push({
-                                            source: dict[k.i].id,
-                                            target: dict[n.i].id,
-                                            weight: 13
+                                            source: dict[n.i].id,
+                                            target: dict[k.i].id,
+                                            weight: 17
                                         });
-                                        /*
+                                    }
+                                }
+                            }
+                        }
+                    };
+
+                    add(Find(g, s));
+
+                    /*
+                    var dups = {};
+                    for (var i = 0; i < nodes.length; i++) {
+                        var n = g[nodes[i].ref];
+                        for (var j = 0; n.n && j < n.n.length; j++) {
+                            var k = g[n.n[j]];
+                            if (dict[k.i]) {
+                                var k1 = dict[n.i].id + "-" + dict[k.i].id;
+                                var k2 = dict[k.i].id + "-" + dict[n.i].id;
+                                if (dups[k1] || dups[k2]) {
+                                    console.log("dup");
+                                } else {
+                                    if (nodes[i].links > 7) {
+                                        console.log("full");
+                                    } else {
                                         links.push({
                                             source: dict[n.i].id,
                                             target: dict[k.i].id,
                                             weight: 13
-                                        });*/
+                                        });
+                                        dups[k1] = true;
+                                        dups[k2] = true;
+                                        nodes[i].links = (nodes[i].links | 0) + 1;
                                     }
                                 }
                             }
-
                         }
-
-                    };
-
-                    add(Find(g, s));
+                    } 
+                    */
 
                     return {
                         "nodes": nodes,
@@ -194,9 +207,9 @@
                     .size([width, height])
                     .nodes(nodes)
                     .links(links)
-                    .gravity(0.07)
-                    .charge(-277)
-                    .linkDistance(311);
+                    .gravity(0.15)
+                    .charge(-550)
+                    .linkDistance(110);
 
                 resize();
 
