@@ -78,22 +78,16 @@
                 build: function (g, s) {
                     var nodes = []; var links = []; var dict = {};
 
-
                     function add(n, len, w) {
-                        
-                        // if (nodes.length > 71) return;
-
-          
+                                   
                         if (n) {
 
                             if (typeof len === 'number') {
                             } else {
-                                len = n.n.length;
+                                len = 17; // Window Size
                             }
 
                             if (typeof w !== 'number') w = 31;
-
-
 
                             if (dict[n.i]) {
                                 return;
@@ -109,10 +103,10 @@
                             
                             if (n.n && n.n.length > 0) {
 
-                                for (var j = 0; j < len && j < n.n.length; j++) {
-                                    var k = g[n.n[j].i];
+                                for (var j = 0; j < len && j < n.n.length && j < 11; j++) {
+                                    var k = g[n.n[j]];
 
-                                    add(k, len * 0.13 , w * 0.7);
+                                    add(k, len * 0.33 , w * 0.67);
 
                                     if (dict[k.i]) {
                                         links.push({
@@ -165,7 +159,7 @@
         
         var c10 = d3.scale.category10(); // Load Color Scale 
         
-        d3.json("graph.json", function (data) {
+        d3.json("17-7.json", function (data) {
 
             document.getElementById("loading").style.display = "none";
 
@@ -186,7 +180,7 @@
 
                 var g = d3.select("body").append("svg").append("g");
 
-                var graph = d3.graph.build(data.graph, s);
+                var graph = d3.graph.build(data.g, s);
 
                 var nodes = graph.nodes, links = graph.links;
 
@@ -222,7 +216,6 @@
                     }, 100);
                 }
 
-                //Add links to SVG
                 var link = g.selectAll(".link")
                     .data(links)
                     .enter()
@@ -230,7 +223,6 @@
                     .attr("stroke-width", function (d) { return d.weight / 10; })
                     .attr("class", "link");
 
-                //Add nodes to SVG
                 var node = g.selectAll(".node")
                     .data(nodes)
                     .enter()
@@ -239,26 +231,26 @@
                     .on("dblclick", dblclick)
                     .call(force.drag);
 
-                //Add labels to each node
                 var label = node.append("text")
-                    .attr("dx", 12)
-                    .attr("dy", "0.35em")
+                    .attr("dx", "0.3em")
+                    .attr("dy", "0.3em")
                     .attr("font-size", function (d) { return d.influence * 1.5 > 21 ? d.influence * 1.5 : 21; })
                     .text(function (d) { return d.character; });
 
-                //Add circles to each node
                 var circle = node.append("circle")
                     .attr("r", function (d) { return d.influence / 2 > 5 ? d.influence / 2 : 5; })
                     .attr("fill", function (d) { return c10(d.zone * 10); });
 
-                //This function will be executed for every tick of force layout
                 force.on("tick", function () {
 
                     //Set X and Y of node
+
                     node.attr("r", function (d) { return d.influence; })
                         .attr("cx", function (d) { return d.x; })
                         .attr("cy", function (d) { return d.y; });
+
                     //Set X, Y of link
+
                     link.attr("x1", function (d) { return d.source.x; })
                     link.attr("y1", function (d) { return d.source.y; })
                     link.attr("x2", function (d) { return d.target.x; })
@@ -274,11 +266,9 @@
                         .attr("y2", function (d) { return d.target.y; });
                     */
 
-                    //Shift node a little
                     node.attr("transform", function (d) { return "translate(" + d.x + "," + d.y + ")"; });
                 });
 
-                //Start the force layout calculation
                 force.start();
             }            
 
