@@ -108,16 +108,17 @@
                             }
                             
                             if (n.n && n.n.length > 0) {
-                                for (var j = 0; j < len && j < n.n.length && j < 11; j++) {
+                                for (var j = 0; j < len && j < n.n.length; j++) {
                                     var k = g[n.n[j]];
-                                    add(k, len * 0.253, w * 0.747, level + 1);
+                                    add(k, len * 0.233, w * 0.747, level + 1);
+                                     
                                     if (dict[k.i]) {
                                         links.push({
                                             source: dict[n.i].id,
                                             target: dict[k.i].id,
                                             weight: w * 0.6
                                         });
-                                    }
+                                    } 
                                 }
                             }
                         }
@@ -129,14 +130,14 @@
 
                     if (root) {
                         for (var i = 0; i < nodes.length; i++) {
-                            var n = g[nodes[i].ref];
+                            var n = g[nodes[i].ref];                            
                             for (var j = 0; n.n && j < n.n.length; j++) {
                                 var k = g[n.n[j]];
-                                if (dict[k.i] && k.i === root.i) {
+                                if (dict[k.i] && k.i == root.i && false) {
                                     links.push({
                                         source: dict[k.i].id,
                                         target: dict[n.i].id,
-                                        weight: 10
+                                        weight: k.i == root.i ? 30 : 10
                                     });
                                 }
                             }
@@ -233,7 +234,7 @@
                     .links(links)
                     .gravity(0.05)
                     .charge(-200)
-                    .linkDistance(270);
+                    .linkDistance(300);
 
                 resize();
 
