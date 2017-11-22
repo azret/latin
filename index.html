@@ -109,7 +109,7 @@
                                         links.push({
                                             source: dict[n.i].id,
                                             target: dict[k.i].id,
-                                            weight: 17
+                                            weight: w
                                         });
                                     }
                                 }
@@ -207,9 +207,9 @@
                     .size([width, height])
                     .nodes(nodes)
                     .links(links)
-                    .gravity(0.15)
-                    .charge(-550)
-                    .linkDistance(110);
+                    .gravity(0.05)
+                    .charge(-300)
+                    .linkDistance(200);
 
                 resize();
 
