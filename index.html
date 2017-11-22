@@ -78,7 +78,13 @@
                 build: function (g, s) {
                     var nodes = []; var links = []; var dict = {};
 
-                    function add(n, len, w) {                                   
+                    function add(n, len, w, level) {
+
+                        if (typeof level === 'number') {
+                        } else {
+                            level = 1;
+                        }
+
                         if (n) {
 
                             if (typeof len === 'number') {
@@ -96,7 +102,7 @@
                                     "id": nodes.length,
                                     "influence": w,
                                     "ref": n.i,
-                                    "zone": n.w
+                                    "zone": level
                                 };
                                 nodes.push(e);
                             }
@@ -104,12 +110,12 @@
                             if (n.n && n.n.length > 0) {
                                 for (var j = 0; j < len && j < n.n.length; j++) {
                                     var k = g[n.n[j]];
-                                    add(k, len * 0.253, w * 0.747);
+                                    add(k, len * 0.253, w * 0.647, level + 1);
                                     if (dict[k.i]) {
                                         links.push({
                                             source: dict[n.i].id,
                                             target: dict[k.i].id,
-                                            weight: w
+                                            weight: w * 1.1
                                         });
                                     }
                                 }
@@ -117,7 +123,25 @@
                         }
                     };
 
-                    add(Find(g, s));
+                    var root = Find(g, s);
+
+                    add(root);
+
+                    if (root) {
+                        for (var i = 0; i < nodes.length; i++) {
+                            var n = g[nodes[i].ref];
+                            for (var j = 0; n.n && j < n.n.length; j++) {
+                                var k = g[n.n[j]];
+                                if (dict[k.i] && k.i === root.i) {
+                                    links.push({
+                                        source: dict[k.i].id,
+                                        target: dict[n.i].id,
+                                        weight: 10
+                                    });
+                                }
+                            }
+                        }
+                    }                    
 
                     /*
                     var dups = {};
